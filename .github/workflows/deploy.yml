@@ -1,0 +1,34 @@
+name: Deploy Static Website to S3
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AKIAUE7FZ2LIHW5MJAK5 }}
+          aws-secret-access-key: ${{ secrets.ZTikw3tN8uBMRohePTpT8yce8rOWDpbQbJJ5IztV }}
+          aws-region: ${{ secrets.ap-south-1 }}
+
+      - name: Upload files to S3
+        run: |
+          aws s3 sync . s3://${{ secrets.s3-private-bucket-1-9 }} \
+          --delete \
+          --exclude ".git/*" \
+          --exclude ".github/*"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+          --distribution-id ${{ secrets.E2UDCQ7EF37DN7 }} \
+          --paths "/*"
